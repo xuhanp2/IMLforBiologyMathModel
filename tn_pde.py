@@ -7,14 +7,22 @@ plt.rc('text', usetex=False)
 
 # Parameters
 N = 800
-wi = 1
-wg = 0.5
-Lambda = 0.01
-R, S, T, P = 6, 3, 8, 5  # PD  game
+# wi = 1
+# wg = 0.5
+# Lambda = 0.01
+# R, S, T, P = 6, 3, 8, 5  # PD  game
 # wi = 0.3
 # wg = 1
 # Lambda = 0.1
 # R, S, T, P = 6, 5, 12, 3  # HD  game
+# dt = 0.0005
+# time_steps = 10000
+
+wi = 0.3
+wg = 100
+Lambda = 100
+# R, S, T, P = 6, 5, 12, 3  # HD  game
+R, S, T, P = 6, 3, 8, 5  # PD  game
 dt = 0.0005
 time_steps = 10000
 

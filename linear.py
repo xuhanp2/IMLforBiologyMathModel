@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 import numpy.linalg as LA
 
-def TN_linear_system(t, f, R, S, T, P, w_I, w_G, Lambda):
+def linear_system(t, f, R, S, T, P, w_I, w_G, Lambda):
     f0, f1, f2 = f
 
     G0 = P
@@ -22,14 +22,29 @@ def TN_linear_system(t, f, R, S, T, P, w_I, w_G, Lambda):
           + Lambda * w_G * f2 * (R - avgG)
 
     return np.array([df0, df1, df2])
-w_I, w_G, Lambda = 0.1, 0.1, 10
+w_I, w_G, Lambda = 0.01, 0.01, 100
 f0_init = np.array([0.33, 0.33, 0.34])
-t_span = (0, 200)
+t_span = (0, 20)
 dt = 0.001
-# HD = dict(R=6, S=5, T=12, P=3)
-PD = dict(R=7, S=3, T=8, P=6) #P>
-# PD = dict(R=6, S=3, T=7, P=5) #R>
-# PD = dict(R=5, S=3, T=8, P=6) 
+HD = dict(R=6, S=5, T=12, P=3)
+PD = dict(R=6, S=3, T=7, P=5) #R>
+def rk4_step(func, t, y, dt):
+    k1 = func(t, y)
+    k2 = func(t + 0.5*dt, y + 0.5*dt*k1)
+    k3 = func(t + 0.5*dt, y + 0.5*dt*k2)
+    k4 = func(t + dt, y + dt*k3)
+    return y + (dt / 6.0) * (k1 + 2*k2 + 2*k3 + k4)
+
+def solve_ode(system_func, y0, t_span, dt):
+    t_start, t_end = t_span
+    t_values = np.arange(t_start, t_end, dt)
+    y_values = np.zeros((len(t_values), len(y0)))
+    y_current = np.array(y0)
+    for i, t in enumerate(t_values):
+        y_values[i] = y_current
+        y_next = rk4_step(system_func, t, y_current, dt)
+        y_current = y_next / np.sum(y_next) 
+    return t_values, y_values
 def solve(system, y0, params):
     t_vals = np.arange(t_span[0], t_span[1], dt)
     y_vals = np.zeros((len(t_vals), 3))
@@ -43,22 +58,22 @@ def solve(system, y0, params):
         y = y / np.sum(y) 
 
     return t_vals, y_vals
-# t_HD, res_HD = solve(TN_linear_system, f0_init, HD)
-t_PD, res_PD = solve(TN_linear_system, f0_init, PD)
+t_HD, res_HD = solve(linear_system, f0_init, HD)
+t_PD, res_PD = solve(linear_system, f0_init, PD)
 
-# plt.figure(figsize=(7,5))
-# plt.plot(t_HD, res_HD[:,0], label=r"$f_0$ (Defect)", color="red")
-# plt.plot(t_HD, res_HD[:,1], label=r"$f_1$ (Hybrid)", color="orange")
-# plt.plot(t_HD, res_HD[:,2], label=r"$f_2$ (Cooperate)", color="green")
+plt.figure(figsize=(7,5))
+plt.plot(t_HD, res_HD[:,0], label=r"$f_0$ (Defect)", color="red")
+plt.plot(t_HD, res_HD[:,1], label=r"$f_1$ (Hybrid)", color="orange")
+plt.plot(t_HD, res_HD[:,2], label=r"$f_2$ (Cooperate)", color="green")
 
-# plt.title("Linear Model (HD game)")
-# plt.xlabel("Time")
-# plt.ylabel("Frequency")
-# plt.grid(alpha=0.3)
-# plt.legend()
-# plt.tight_layout()
-# plt.ylim(0, 1)
-# plt.show()
+plt.title("Linear Model (HD game)")
+plt.xlabel("Time")
+plt.ylabel("Frequency")
+plt.grid(alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.ylim(0, 1)
+plt.show()
 
 
 plt.figure(figsize=(7,5))
