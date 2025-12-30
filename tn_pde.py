@@ -11,20 +11,20 @@ N = 800
 # wg = 0.5
 # Lambda = 0.01
 # R, S, T, P = 6, 3, 8, 5  # PD  game
-# wi = 0.3
-# wg = 1
-# Lambda = 0.1
-# R, S, T, P = 6, 5, 12, 3  # HD  game
-# dt = 0.0005
-# time_steps = 10000
-
 wi = 0.3
-wg = 100
-Lambda = 100
-# R, S, T, P = 6, 5, 12, 3  # HD  game
-R, S, T, P = 6, 3, 8, 5  # PD  game
+wg = 1
+Lambda = 0.1
+R, S, T, P = 6, 5, 12, 3  # HD  game
 dt = 0.0005
 time_steps = 10000
+
+# wi = 0.3
+# wg = 100
+# Lambda = 100
+# R, S, T, P = 6, 5, 12, 3  # HD  game
+# R, S, T, P = 6, 3, 8, 5  # PD  game
+# dt = 0.0005
+# time_steps = 10000
 
 # fj = np.ones(N, dtype=float)
 # # normalize so that ∫ f dx ≈ 1
@@ -114,8 +114,9 @@ def within_grp_flux(fj):
     return (-fluxes[1:] + fluxes[:-1]) * N  
 
 def between_group_term(fj):
-    return (Lambda / N) * fj * (curly_G(fj) - 1)
+    # return (Lambda / N) * fj * (curly_G(fj) - 1)
     # return (Lambda / N) * fj * (curly_G(fj) - np.sum(curly_G(fj) * fj)) #Question: should there be a /N (dx) here?
+    return Lambda * fj * (curly_G(fj) - (1/N) * np.sum(curly_G(fj) * fj))
 
 
 for time in range(time_steps):
